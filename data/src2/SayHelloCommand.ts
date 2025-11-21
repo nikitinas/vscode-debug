@@ -7,9 +7,7 @@ export class SayHelloCommand {
 
   private readonly sampleFiles = [
     'data/src1/CodeElement.java',
-    'data/src2/CodeElement.java',
-    'data/src1/SayHelloCommand.ts',
-    'data/src2/SayHelloCommand.ts',
+    'data/src2/CodeElement.java'
   ];
 
   constructor(
@@ -26,18 +24,12 @@ export class SayHelloCommand {
       samples[0],
       samples[1],
       samples[0],
-      samples[1],
-      samples[0],
-      samples[1],
-      samples[2],
-      samples[3],
-      samples[2],
-      samples[3],
+      samples[1]
     ];
 
+    vscode.window.showInformationMessage('Running semantic tokens sample...');
     this.output.clear();
     this.output.show(true);
-    this.output.appendLine('Running semantic tokens sample...');
     this.output.appendLine(`Executing semantic tokens run for ${runOrder.length} requests:`);
     runOrder.forEach((sample, index) => {
       this.output.appendLine(`  [${index}] ${sample}`);
@@ -52,7 +44,7 @@ export class SayHelloCommand {
       await Promise.all(requests);
     }
 
-    this.output.appendLine('Semantic tokens run completed. See the Semantic Tokens Tester output.');
+    vscode.window.showInformationMessage('Semantic tokens run completed. See the Semantic Tokens Tester output.');
   }
 
   private buildSamplePath(sample: string): string {
