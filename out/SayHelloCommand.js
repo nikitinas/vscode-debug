@@ -39,16 +39,21 @@ const vscode = __importStar(require("vscode"));
 const PrevenParallelAsync_1 = require("./PrevenParallelAsync");
 class SayHelloCommand {
     extensionUri;
+    output;
     id = 'semanticTokensTester.run';
     sampleFiles = ['CodeElement.java', 'CodeElement2.java'];
-    constructor(extensionUri) {
+    constructor(extensionUri, output) {
         this.extensionUri = extensionUri;
+        this.output = output;
+        (0, PrevenParallelAsync_1.setSequentialLogger)(output);
     }
     async execute() {
         const samples = this.sampleFiles.map((file) => this.buildSamplePath(file));
         const runOrder = [samples[0], samples[1], samples[0], samples[1]];
         vscode.window.showInformationMessage('Running semantic tokens sample...');
-        console.log('Executing semantic tokens run for:', runOrder.join(', '));
+        this.output.clear();
+        this.output.show(true);
+        this.output.appendLine(`Executing semantic tokens run for: ${runOrder.join(', ')}`);
         const useQueue = false;
         if (useQueue) {
             runOrder.forEach((sample) => (0, PrevenParallelAsync_1.executeSequential)(() => this.provideDocumentSemanticTokens(sample)));
@@ -58,7 +63,7 @@ class SayHelloCommand {
                 await this.provideDocumentSemanticTokens(sample);
             }
         }
-        vscode.window.showInformationMessage('Semantic tokens run completed. See console for details.');
+        vscode.window.showInformationMessage('Semantic tokens run completed. See the Semantic Tokens Tester output.');
     }
     buildSamplePath(sample) {
         return path.join(this.extensionUri.fsPath, 'data', sample);
@@ -68,11 +73,11 @@ class SayHelloCommand {
         const doc = await vscode.workspace.openTextDocument(vsUri);
         const tokens = await vscode.commands.executeCommand('vscode.provideDocumentSemanticTokens', doc.uri);
         if (!tokens) {
-            console.warn(`No semantic tokens returned for ${doc.uri.fsPath}`);
+            this.output.appendLine(`No semantic tokens returned for ${doc.uri.fsPath}`);
             return;
         }
         this.describe(doc, tokens);
-        console.log('doc', doc.uri.fsPath, 'resultId', tokens.resultId, 'tokens', tokens.data.length / 5);
+        this.output.appendLine(`doc=${doc.uri.fsPath} resultId=${tokens.resultId ?? 'n/a'} tokens=${tokens.data.length / 5}`);
     }
     describe(doc, tokens) {
         const { data } = tokens;
@@ -88,14 +93,11 @@ class SayHelloCommand {
             const currentLine = prevLine + deltaLine;
             const currentChar = prevLine === currentLine ? prevChar + deltaStart : deltaStart;
             if (currentLine >= lineCount) {
-                console.warn('Token outside document bounds', {
-                    currentLine,
-                    lineCount,
-                    currentChar,
-                    length
-                });
+                this.output.appendLine(`Token outside document bounds line=${currentLine} max=${lineCount} col=${currentChar} len=${length}`);
             }
-            console.log(`token line=${currentLine} col=${currentChar} len=${length} typeIndex=${tokenTypeIndex} mods=${tokenModifiers}`);
+            // this.output.appendLine(
+            //   `token line=${currentLine} col=${currentChar} len=${length} typeIndex=${tokenTypeIndex} mods=${tokenModifiers}`
+            // );
             prevLine = currentLine;
             prevChar = currentChar;
         }

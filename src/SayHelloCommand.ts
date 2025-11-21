@@ -1,20 +1,27 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { executeSequential } from './PrevenParallelAsync';
+import { executeSequential, setSequentialLogger } from './PrevenParallelAsync';
 
 export class SayHelloCommand {
   readonly id = 'semanticTokensTester.run';
 
   private readonly sampleFiles = ['CodeElement.java', 'CodeElement2.java'];
 
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly extensionUri: vscode.Uri,
+    private readonly output: vscode.OutputChannel
+  ) {
+    setSequentialLogger(output);
+  }
 
   async execute(): Promise<void> {
     const samples = this.sampleFiles.map((file) => this.buildSamplePath(file));
     const runOrder = [samples[0], samples[1], samples[0], samples[1]];
 
     vscode.window.showInformationMessage('Running semantic tokens sample...');
-    console.log('Executing semantic tokens run for:', runOrder.join(', '));
+    this.output.clear();
+    this.output.show(true);
+    this.output.appendLine(`Executing semantic tokens run for: ${runOrder.join(', ')}`);
 
     const useQueue = false;
 
@@ -26,7 +33,7 @@ export class SayHelloCommand {
       }
     }
 
-    vscode.window.showInformationMessage('Semantic tokens run completed. See console for details.');
+    vscode.window.showInformationMessage('Semantic tokens run completed. See the Semantic Tokens Tester output.');
   }
 
   private buildSamplePath(sample: string): string {
@@ -42,12 +49,14 @@ export class SayHelloCommand {
     );
 
     if (!tokens) {
-      console.warn(`No semantic tokens returned for ${doc.uri.fsPath}`);
+      this.output.appendLine(`No semantic tokens returned for ${doc.uri.fsPath}`);
       return;
     }
 
     this.describe(doc, tokens);
-    console.log('doc', doc.uri.fsPath, 'resultId', tokens.resultId, 'tokens', tokens.data.length / 5);
+    this.output.appendLine(
+       `doc=${doc.uri.fsPath} resultId=${tokens.resultId ?? 'n/a'} tokens=${tokens.data.length / 5}`
+    );
   }
 
   private describe(doc: vscode.TextDocument, tokens: vscode.SemanticTokens): void {
@@ -67,17 +76,14 @@ export class SayHelloCommand {
       const currentChar = prevLine === currentLine ? prevChar + deltaStart : deltaStart;
 
       if (currentLine >= lineCount) {
-        console.warn('Token outside document bounds', {
-          currentLine,
-          lineCount,
-          currentChar,
-          length
-        });
+        this.output.appendLine(
+          `Token outside document bounds line=${currentLine} max=${lineCount} col=${currentChar} len=${length}`
+        );
       }
 
-      console.log(
-        `token line=${currentLine} col=${currentChar} len=${length} typeIndex=${tokenTypeIndex} mods=${tokenModifiers}`
-      );
+      // this.output.appendLine(
+      //   `token line=${currentLine} col=${currentChar} len=${length} typeIndex=${tokenTypeIndex} mods=${tokenModifiers}`
+      // );
 
       prevLine = currentLine;
       prevChar = currentChar;

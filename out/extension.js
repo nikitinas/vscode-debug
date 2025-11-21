@@ -39,9 +39,10 @@ const vscode = __importStar(require("vscode"));
 const SemanticTokenProvider_1 = require("./SemanticTokenProvider");
 const SayHelloCommand_1 = require("./SayHelloCommand");
 function activate(context) {
-    console.log('Semantic Tokens Tester extension activating');
+    const output = vscode.window.createOutputChannel('Semantic Tokens Tester');
+    output.appendLine('Semantic Tokens Tester extension activating');
     (0, SemanticTokenProvider_1.registerJavaSemanticTokensProvider)(context);
-    const command = new SayHelloCommand_1.SayHelloCommand(context.extensionUri);
+    const command = new SayHelloCommand_1.SayHelloCommand(context.extensionUri, output);
     context.subscriptions.push(vscode.commands.registerCommand(command.id, () => command.execute()));
 }
 function deactivate() {
