@@ -21,6 +21,12 @@ This VS Code extension exercises the `vscode.provideDocumentSemanticTokens` comm
 
 You can toggle the `useQueue` flag inside `SayHelloCommand` to experiment with sequential vs. queued calls.
 
+## Testing
+
+- `npm test` compiles the extension and launches the VS Code integration tests via `@vscode/test-electron`.
+- The new `semanticTokens.test.ts` test opens the bundled `data/src1/CodeElement.java` and `data/src2/CodeElement.java` files as loose files (no workspace) to reproduce the parallel `vscode.provideDocumentSemanticTokens` issue.
+- Ensure the `redhat.java` extension is available in the test environment so semantic tokens can be produced.
+
 ## Project Structure
 
 - `src/extension.ts` – entry point that wires the command and output channel.
