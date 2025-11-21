@@ -6,8 +6,8 @@ export class SayHelloCommand {
   readonly id = 'semanticTokensTester.run';
 
   private readonly sampleFiles = [
-    'sample-java/src/main/java/com/example/sample/Sample.java',
-    'sample-java/src/main/java/com/example/sample/SampleTwo.java'
+    'data/src1/CodeElement.java',
+    'data/src2/CodeElement.java'
   ];
 
   constructor(
@@ -19,6 +19,7 @@ export class SayHelloCommand {
 
   async execute(): Promise<void> {
     const samples = this.sampleFiles.map((file) => this.buildSamplePath(file));
+    console.log('samples', samples);
     const runOrder = [
       samples[0],
       samples[1],
