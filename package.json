@@ -1,0 +1,38 @@
+{
+  "name": "semantic-tokens-tester",
+  "displayName": "Semantic Tokens Tester",
+  "description": "Exercises the vscode.provideDocumentSemanticTokens API against bundled Java samples.",
+  "version": "0.0.1",
+  "publisher": "sample",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:semanticTokensTester.run"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "semanticTokensTester.run",
+        "category": "Semantic Tokens Tester",
+        "title": "Run Semantic Tokens Sample"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.93.0",
+    "typescript": "^5.5.4"
+  }
+}
