@@ -15,6 +15,9 @@
     "onCommand:semanticTokensTester.run"
   ],
   "main": "./out/extension.js",
+  "extensionDependencies": [
+    "redhat.java"
+  ],
   "contributes": {
     "commands": [
       {

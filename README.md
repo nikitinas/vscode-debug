@@ -1,13 +1,13 @@
 # Semantic Tokens Tester
 
-This VS Code extension exercises the `vscode.provideDocumentSemanticTokens` command by loading two bundled Java source files, requesting the semantic tokens that the active VS Code session can provide, and logging the decoded output.
+This VS Code extension exercises the `vscode.provideDocumentSemanticTokens` command by loading Java source files from a bundled sample project, requesting the semantic tokens that the active VS Code session can provide, and logging the decoded output.
 
 ## Features
 
-- Registers a lightweight semantic token provider for Java files so the command always succeeds without additional extensions.
+- Relies on your installed Java tooling (e.g., Red Hat Java) to provide semantic tokens for the sample project.
 - Includes a command palette entry `Run Semantic Tokens Sample` (`semanticTokensTester.run`) that:
-  1. Opens the Java fixtures under `data/`.
-  2. Invokes `vscode.provideDocumentSemanticTokens` four times in sequence.
+  1. Opens both Java files (`Sample.java` and `SampleTwo.java`) under `sample-java/`.
+  2. Issues semantic token requests for them in parallel (twice each).
   3. Logs the decoded semantic token stream so you can inspect deltas, token types, and modifiers.
 - Provides a helper utility to serialize async executions if you want to experiment with overlapping requests.
 
@@ -23,10 +23,9 @@ You can toggle the `useQueue` flag inside `SayHelloCommand` to experiment with s
 
 ## Project Structure
 
-- `src/extension.ts` – entry point that wires commands and the Java semantic token provider.
+- `src/extension.ts` – entry point that wires the command and output channel.
 - `src/SayHelloCommand.ts` – command implementation that drives sample requests.
-- `src/SemanticTokenProvider.ts` – a simple semantic token provider for Java files.
-- `data/CodeElement*.java` – fixtures that always produce tokens.
+- `sample-java/` – a minimal Maven project with `Sample.java` and `SampleTwo.java` used for token testing.
 
 ## Packaging
 

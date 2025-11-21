@@ -5,7 +5,10 @@ import { executeSequential, setSequentialLogger } from './PrevenParallelAsync';
 export class SayHelloCommand {
   readonly id = 'semanticTokensTester.run';
 
-  private readonly sampleFiles = ['CodeElement.java', 'CodeElement2.java'];
+  private readonly sampleFiles = [
+    'sample-java/src/main/java/com/example/sample/Sample.java',
+    'sample-java/src/main/java/com/example/sample/SampleTwo.java'
+  ];
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -28,16 +31,15 @@ export class SayHelloCommand {
     if (useQueue) {
       runOrder.forEach((sample) => executeSequential(() => this.provideDocumentSemanticTokens(sample)));
     } else {
-      for (const sample of runOrder) {
-        await this.provideDocumentSemanticTokens(sample);
-      }
+      const requests = runOrder.map((sample) => this.provideDocumentSemanticTokens(sample));
+      await Promise.all(requests);
     }
 
     vscode.window.showInformationMessage('Semantic tokens run completed. See the Semantic Tokens Tester output.');
   }
 
   private buildSamplePath(sample: string): string {
-    return path.join(this.extensionUri.fsPath, 'data', sample);
+    return path.join(this.extensionUri.fsPath, sample);
   }
 
   private async provideDocumentSemanticTokens(samplePath: string): Promise<void> {

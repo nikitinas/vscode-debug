@@ -41,7 +41,10 @@ class SayHelloCommand {
     extensionUri;
     output;
     id = 'semanticTokensTester.run';
-    sampleFiles = ['CodeElement.java', 'CodeElement2.java'];
+    sampleFiles = [
+        'sample-java/src/main/java/com/example/sample/Sample.java',
+        'sample-java/src/main/java/com/example/sample/SampleTwo.java'
+    ];
     constructor(extensionUri, output) {
         this.extensionUri = extensionUri;
         this.output = output;
@@ -59,14 +62,13 @@ class SayHelloCommand {
             runOrder.forEach((sample) => (0, PrevenParallelAsync_1.executeSequential)(() => this.provideDocumentSemanticTokens(sample)));
         }
         else {
-            for (const sample of runOrder) {
-                await this.provideDocumentSemanticTokens(sample);
-            }
+            const requests = runOrder.map((sample) => this.provideDocumentSemanticTokens(sample));
+            await Promise.all(requests);
         }
         vscode.window.showInformationMessage('Semantic tokens run completed. See the Semantic Tokens Tester output.');
     }
     buildSamplePath(sample) {
-        return path.join(this.extensionUri.fsPath, 'data', sample);
+        return path.join(this.extensionUri.fsPath, sample);
     }
     async provideDocumentSemanticTokens(samplePath) {
         const vsUri = vscode.Uri.file(samplePath);
