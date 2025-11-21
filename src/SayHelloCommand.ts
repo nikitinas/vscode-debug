@@ -19,12 +19,24 @@ export class SayHelloCommand {
 
   async execute(): Promise<void> {
     const samples = this.sampleFiles.map((file) => this.buildSamplePath(file));
-    const runOrder = [samples[0], samples[1], samples[0], samples[1]];
+    const runOrder = [
+      samples[0],
+      samples[1],
+      samples[0],
+      samples[1],
+      samples[0],
+      samples[1],
+      samples[0],
+      samples[1]
+    ];
 
     vscode.window.showInformationMessage('Running semantic tokens sample...');
     this.output.clear();
     this.output.show(true);
-    this.output.appendLine(`Executing semantic tokens run for: ${runOrder.join(', ')}`);
+    this.output.appendLine(`Executing semantic tokens run for ${runOrder.length} requests:`);
+    runOrder.forEach((sample, index) => {
+      this.output.appendLine(`  [${index + 1}] ${sample}`);
+    });
 
     const useQueue = false;
 
